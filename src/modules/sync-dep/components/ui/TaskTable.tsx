@@ -129,8 +129,8 @@ export const TaskTable: React.FC<Props> = ({ tasks, onTaskClick }) => {
                   <td className="px-2 py-2">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-primary shrink-0">
-                        {creator ? (((creator as any).avatar_url || creator.avatar) ? (
-                          <img src={(creator as any).avatar_url || creator.avatar} alt={creator.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        {creator ? (((creator as any).avatar_url || (creator as any).avatar) ? (
+                          <img src={(creator as any).avatar_url || (creator as any).avatar} alt={creator.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                         ) : (
                           creator.name?.charAt(0).toUpperCase() || '?'
                         )) : '?'}

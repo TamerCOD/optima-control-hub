@@ -111,7 +111,7 @@ const TaskDetailModal: React.FC<Props> = ({
                 type: taskSettings.taskTypes[0].id,
                 projectId: defaultProject?.id || '',
                 reporterId: currentUser.id,
-                assigneeId: defaultProject?.autoAssignCreator ? currentUser.id : null,
+                assigneeId: defaultProject?.autoAssignCreator ? currentUser.id : '',
                 startDate: now.toISOString(),
                 endDate: initialEndDate,
                 createdAt: now.toISOString(),
@@ -124,7 +124,10 @@ const TaskDetailModal: React.FC<Props> = ({
                 links: [],
                 customFieldValues: {},
                 auditLog: [],
-                updates: []
+                updates: [],
+                parentId: null,
+                components: [],
+                comments: []
             });
         } else if (taskId) {
             const existing = tasks.find(t => t.id === taskId);

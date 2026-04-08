@@ -5,7 +5,7 @@ import {
     CheckCircle2,
     MessageSquare, Activity, ArrowRight
 } from 'lucide-react';
-import { ProjectTask, User, Project, TaskSettings, TaskComment, TaskUpdate } from '../../types';
+import { ProjectTask, User, Project, TaskSettings, TaskComment, TaskUpdate, TaskUpdateEntry } from '../../types';
 
 interface Props {
     tasks: ProjectTask[];

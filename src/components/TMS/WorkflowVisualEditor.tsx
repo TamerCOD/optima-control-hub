@@ -83,7 +83,7 @@ const WorkflowVisualEditor: React.FC<Props> = ({ workflow, statuses, onSave, onC
       markerEnd: { type: MarkerType.ArrowClosed },
       style: { strokeWidth: 2 }
     };
-    setEdges((eds) => addEdge(newEdge, eds));
+    setEdges((eds) => addEdge(newEdge as any, eds));
     setSelectedEdge(newEdge as Edge);
   }, [setEdges]);
 

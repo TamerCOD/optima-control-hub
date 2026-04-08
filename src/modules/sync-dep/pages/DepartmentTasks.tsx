@@ -353,7 +353,7 @@ export const DepartmentTasks: React.FC = () => {
                         // Map IDs to user objects (from users or allUsers)
                         const assignees = Array.from(allAssigneeIds).map(id => {
                           const user = users.find(u => u.id === id) || allUsers.find(u => u.id === id);
-                          return user ? { id, name: user.name, avatar_url: (user as any).avatar_url || user.avatar } : { id, name: 'Неизвестный пользователь', avatar_url: null };
+                          return user ? { id, name: user.name, avatar_url: (user as any).avatar_url || (user as any).avatar } : { id, name: 'Неизвестный пользователь', avatar_url: null };
                         }).sort((a, b) => a.name.localeCompare(b.name));
 
                         return (

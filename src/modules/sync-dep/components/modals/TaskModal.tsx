@@ -455,7 +455,7 @@ export const TaskModal: React.FC<Props> = ({ task: initialTask, onClose }) => {
                     <span className="text-xs text-zinc-500 dark:text-zinc-400 block mb-1">Создатель</span>
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-[10px] font-medium overflow-hidden">
-                        {creator ? ((creator as any).avatar_url || creator.avatar ? <img src={(creator as any).avatar_url || creator.avatar} alt="Creator avatar" className="w-full h-full object-cover" /> : creator.name[0]) : '?'}
+                        {creator ? (((creator as any).avatar_url || (creator as any).avatar) ? <img src={(creator as any).avatar_url || (creator as any).avatar} alt="Creator avatar" className="w-full h-full object-cover" /> : creator.name[0]) : '?'}
                       </div>
                       <span className="text-sm text-zinc-900 dark:text-white">{creator?.name || 'Неизвестно'}</span>
                     </div>

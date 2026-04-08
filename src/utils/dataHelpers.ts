@@ -61,8 +61,11 @@ export const MOCK_TASKS: ProjectTask[] = [
         attachments: [],
         comments: [],
         auditLog: [],
-        // ADDED customFieldValues to satisfy ProjectTask interface
-        customFieldValues: {}
+        customFieldValues: {},
+        links: [],
+        subtaskIds: [],
+        checklist: [],
+        dependencies: []
     },
     {
         id: 'task_2',
@@ -85,7 +88,10 @@ export const MOCK_TASKS: ProjectTask[] = [
         attachments: [],
         comments: [],
         auditLog: [],
-        // ADDED customFieldValues to satisfy ProjectTask interface
-        customFieldValues: {}
+        customFieldValues: {},
+        links: [],
+        subtaskIds: [],
+        checklist: [],
+        dependencies: []
     }
 ];

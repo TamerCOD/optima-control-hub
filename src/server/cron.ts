@@ -219,6 +219,15 @@ export async function runAllCronJobs(): Promise<string[]> {
       logs.push(`Issue Automation error: ${e.message}`);
       console.error("Issue Automation error:", e);
     }
+
+    // 5. Run Duties Notifications
+    try {
+      const dutiesLogs = await checkDutiesNotifications();
+      logs.push(...dutiesLogs);
+    } catch (e: any) {
+      logs.push(`Duties Notifications error: ${e.message}`);
+      console.error("Duties Notifications error:", e);
+    }
     
   } catch (e: any) {
     logs.push(`Global Cron error: ${e.message}`);
@@ -811,6 +820,94 @@ async function checkSyncDepNotifications(): Promise<string[]> {
   } catch (e: any) {
     logs.push(`SyncDep Error: ${e.message}`);
     console.error("SyncDep notifications error:", e);
+  }
+  return logs;
+}
+
+async function checkDutiesNotifications() {
+  const logs: string[] = [];
+  try {
+    const settingsDoc = await db.collection('settings').doc('duties').get();
+    if (!settingsDoc.exists) return logs;
+    const settings = settingsDoc.data() as any;
+    
+    const botToken = settings.telegramBotToken;
+    const chatId = settings.telegramChatId;
+    const threadId = settings.telegramThreadId;
+    const notificationTime = settings.notificationTime || '08:00';
+    
+    if (!botToken || !chatId) return logs;
+
+    const nowBishkek = new Date(new Date().getTime() + (6 * 60 * 60 * 1000));
+    const currentHour = String(nowBishkek.getUTCHours()).padStart(2, '0');
+    const currentMinute = String(nowBishkek.getUTCMinutes()).padStart(2, '0');
+    const currentTime = `${currentHour}:${currentMinute}`;
+    const currentDateStr = nowBishkek.toISOString().split('T')[0];
+
+    if (currentTime === notificationTime) {
+      // Check if already sent today
+      const logRef = db.collection('settings').doc('duties_log');
+      const logDoc = await logRef.get();
+      const lastSent = logDoc.exists ? logDoc.data()?.lastSentDate : null;
+
+      if (lastSent !== currentDateStr) {
+        // Fetch today's duties
+        const dutiesSnapshot = await db.collection('duties').where('date', '==', currentDateStr).get();
+        if (!dutiesSnapshot.empty) {
+          const duties = dutiesSnapshot.docs.map(d => d.data() as any);
+          
+          // Fetch users
+          const usersSnapshot = await db.collection('users').get();
+          const usersMap = new Map(usersSnapshot.docs.map(d => [d.id, d.data() as any]));
+
+          // Group by duty type
+          const dutiesByType: Record<string, any[]> = {};
+          duties.forEach(duty => {
+            if (!dutiesByType[duty.dutyTypeId]) {
+              dutiesByType[duty.dutyTypeId] = [];
+            }
+            dutiesByType[duty.dutyTypeId].push(duty);
+          });
+
+          let message = `📅 <b>Дежурства на сегодня (${currentDateStr})</b>\n\n`;
+          let hasDuties = false;
+
+          settings.types.forEach((type: any) => {
+            const typeDuties = dutiesByType[type.id];
+            if (typeDuties && typeDuties.length > 0) {
+              hasDuties = true;
+              message += `🔹 <b>${type.name}</b>:\n`;
+              typeDuties.forEach(duty => {
+                const user = usersMap.get(duty.userId);
+                const userName = user ? user.name : 'Неизвестный';
+                const tgUser = user?.telegramUsername ? ` @${user.telegramUsername.replace('@', '')}` : '';
+                message += `  • ${userName}${tgUser}\n`;
+              });
+              message += `\n`;
+            }
+          });
+
+          if (hasDuties) {
+            const result = await sendTelegramMessage(botToken, chatId, message, threadId);
+            if (result.success) {
+              await logRef.set({ lastSentDate: currentDateStr }, { merge: true });
+              logs.push(`Duties: Daily notification sent for ${currentDateStr}`);
+            } else {
+              logs.push(`Duties: Failed to send daily notification: ${result.error}`);
+            }
+          } else {
+            logs.push(`Duties: No duties found for today.`);
+            await logRef.set({ lastSentDate: currentDateStr }, { merge: true });
+          }
+        } else {
+          logs.push(`Duties: No duties found for today.`);
+          await logRef.set({ lastSentDate: currentDateStr }, { merge: true });
+        }
+      }
+    }
+  } catch (e: any) {
+    logs.push(`Duties Error: ${e.message}`);
+    console.error("Duties notifications error:", e);
   }
   return logs;
 }
