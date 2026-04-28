@@ -1,0 +1,60 @@
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Вспомогательная функция: пользователь авторизован
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // 1. Публичные дашборды (доступны всем для чтения, запись только своим)
+    match /shared_dashboards/{dashboardId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+
+    // 2. Коллекции приложения (доступ только авторизованным)
+    match /users/{userId} {
+      allow read, write: if isAuthenticated();
+    }
+    match /sessions/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /results/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /courses/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /tickets/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /departments/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /roles/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /permissions/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /settings/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /mass_issues/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /tasks/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+    match /projects/{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+
+    // 3. Резервное правило (для любых других документов)
+    match /{document=**} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}
